@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube वीडियो स्पीड प्लेयर</title>
+    <style>
+        /* ====== बेसिक स्टाइलिंग ====== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            background: #121212;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* ====== कंटेनर स्टाइल ====== */
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #1e1e1e;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #ffcc00;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-size: 16px;
+            color: #ccc;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        input, select {
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+        }
+
+        button {
+            background: #ffcc00;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #e6b800;
+        }
+
+        /* ====== वीडियो सेक्शन ====== */
+        #videoContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 320px;
+            height: 180px;
+            background: black;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid #ffcc00;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* ====== कंट्रोल बटन ====== */
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .controls button {
+            flex: 1;
+            min-width: 120px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🎬 YouTube वीडियो स्पीड प्लेयर</h2>
+        
+        <label> YouTube वीडियो लिंक डालें:</label>
+        <input type="text" id="videoLink" placeholder="https://www.youtube.com/watch?v=example">
+        
+        <label> वीडियो क्वालिटी:</label>
+        <select id="videoQuality">
+            <option value="144">144p</option>
+            <option value="360">360p</option>
+            <option value="480">480p</option>
+            <option value="720">720p</option>
+            <option value="1080">1080p</option>
+        </select>
+
+        <label> कितनी वीडियो कॉपी चलानी हैं:</label>
+        <input type="number" id="videoCount" placeholder="5">
+
+        <button onclick="loadVideos()">📺 वीडियो लोड करें</button>
+
+        <div class="controls">
+            <button onclick="playAll()">▶️ सभी वीडियो प्ले करें</button>
+            <button onclick="pauseAll()">⏸️ सभी वीडियो रोकें</button>
+            <button onclick="muteAll()">🔇 सभी म्यूट करें</button>
+            <button onclick="unmuteAll()">🔊 सभी अनम्यूट करें</button>
+        </div>
+
+        <div id="videoContainer"></div>
+    </div>
+
+    <script>
+        let videoPlayers = [];
+
+        function loadVideos() {
+            let link = document.getElementById("videoLink").value;
+            let videoQuality = document.getElementById("videoQuality").value;
+            let videoCount = parseInt(document.getElementById("videoCount").value) || 5;
+            let videoContainer = document.getElementById("videoContainer");
+
+            videoContainer.innerHTML = ""; 
+            videoPlayers = [];
+
+            let regExp = /(?:\?v=|&v=|youtu\.be\/|\/embed\/|\/v\/|\/watch\?v=|&v=|\/shorts\/)([^#&?\/\s]+)/;
+            let match = link.match(regExp);
+            if (!match || !match[1]) {
+                alert("❌ कृपया सही YouTube वीडियो लिंक डालें!");
+                return;
+            }
+            let videoId = match[1];
+
+            for (let i = 0; i < videoCount; i++) {
+                let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&playsinline=1&vq=small&enablejsapi=1`;
+
+                if (videoQuality == "144") {
+                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&playsinline=1&vq=tiny&enablejsapi=1`;
+                } else if (videoQuality == "360") {
+                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&playsinline=1&vq=small&enablejsapi=1`;
+                } else if (videoQuality == "480") {
+                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&playsinline=1&vq=medium&enablejsapi=1`;
+                } else if (videoQuality == "720") {
+                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&playsinline=1&vq=hd720&enablejsapi=1`;
+                } else if (videoQuality == "1080") {
+                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&playsinline=1&vq=hd1080&enablejsapi=1`;
+                }
+
+                let wrapper = document.createElement("div");
+                wrapper.classList.add("video-wrapper");
+
+                let iframe = document.createElement("iframe");
+                iframe.src = embedUrl;
+                iframe.allow = "autoplay; encrypted-media";
+                iframe.id = "video" + i;
+
+                wrapper.appendChild(iframe);
+                videoContainer.appendChild(wrapper);
+
+                videoPlayers.push(iframe);
+            }
+        }
+
+        function playAll() {
+            videoPlayers.forEach(video => {
+                video.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+            });
+        }
+
+        function pauseAll() {
+            videoPlayers.forEach(video => {
+                video.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+            });
+        }
+
+        function muteAll() {
+            videoPlayers.forEach(video => {
+                video.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+            });
+        }
+
+        function unmuteAll() {
+            videoPlayers.forEach(video => {
+                video.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+            });
+        }
+    </script>
+
+</body>
+</html>
